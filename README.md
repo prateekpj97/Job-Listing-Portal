@@ -62,32 +62,6 @@ cd Job-Listing-Portal
 cp .env.example .env   # fill in your values
 ```
 
-### 2. Environment variables (`.env`)
-
-```env
-SECRET_KEY=your-secret-key
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-DB_NAME=jobportal
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=127.0.0.1
-DB_PORT=5432
-
-REDIS_URL=redis://127.0.0.1:6379/0
-CELERY_BROKER_URL=redis://127.0.0.1:6379/1
-CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/2
-
-EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-DEFAULT_FROM_EMAIL=noreply@jobportal.com
-```
-
-### 3. Create the database
-
-```bash
-psql -U postgres -h 127.0.0.1 -c "CREATE DATABASE jobportal;"
-```
 
 ### 4. Run with Docker Compose
 
@@ -97,8 +71,6 @@ docker compose exec web python manage.py makemigrations accounts jobs applicatio
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py createsuperuser
 ```
-
-App runs at **http://localhost:8001**
 
 ---
 

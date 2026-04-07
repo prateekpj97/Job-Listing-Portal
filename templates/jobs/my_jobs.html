@@ -1,44 +1,76 @@
 {% extends 'base.html' %}
 {% block title %}My Jobs{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h3><i class="bi bi-briefcase"></i> My Job Postings</h3>
-  <a href="{% url 'job_create' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Post New Job</a>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+  <div class="rounded-3 p-3" style="background:#eef2ff;"><i class="bi bi-grid-fill" style="color:#4f46e5;font-size:1.3rem;"></i></div>
+  <div>
+    <h3 class="mb-0 fw-800" style="font-weight:800;">My Job Postings</h3>
+    <p class="text-muted small mb-0">{{ jobs|length }} listing{{ jobs|length|pluralize }}</p>
+  </div>
+  <a href="{% url 'job_create' %}" class="btn btn-primary btn-sm ms-auto"><i class="bi bi-plus-lg me-1"></i>Post New Job</a>
 </div>
+
 {% if jobs %}
-<div class="table-responsive">
-  <table class="table table-hover align-middle">
-    <thead class="table-dark">
-      <tr>
-        <th>Title</th><th>Location</th><th>Type</th><th>Status</th><th>Applications</th><th>Posted</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for job in jobs %}
-      <tr>
-        <td><a href="{% url 'job_detail' job.pk %}" class="fw-semibold text-decoration-none">{{ job.title }}</a></td>
-        <td>{{ job.location }}</td>
-        <td><span class="badge bg-primary">{{ job.get_job_type_display }}</span></td>
-        <td>
-          {% if job.is_active %}<span class="badge bg-success">Active</span>
-          {% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
-        </td>
-        <td><a href="{% url 'job_applications' job.pk %}" class="badge bg-info text-decoration-none">{{ job.applications.count }}</a></td>
-        <td><small class="text-muted">{{ job.created_at|date:"M d, Y" }}</small></td>
-        <td>
-          <a href="{% url 'job_edit' job.pk %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-          <a href="{% url 'job_delete' job.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
+        <tr>
+          <th class="ps-4 py-3 fw-600 text-muted small text-uppercase" style="font-weight:600;letter-spacing:.04em;">Job</th>
+          <th class="py-3 fw-600 text-muted small text-uppercase" style="font-weight:600;letter-spacing:.04em;">Type</th>
+          <th class="py-3 fw-600 text-muted small text-uppercase" style="font-weight:600;letter-spacing:.04em;">Status</th>
+          <th class="py-3 fw-600 text-muted small text-uppercase" style="font-weight:600;letter-spacing:.04em;">Applications</th>
+          <th class="py-3 fw-600 text-muted small text-uppercase" style="font-weight:600;letter-spacing:.04em;">Posted</th>
+          <th class="pe-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td class="ps-4 py-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="company-logo" style="width:38px;height:38px;font-size:.85rem;border-radius:9px;">{{ job.company|slice:":1"|upper }}</div>
+              <div>
+                <a href="{% url 'job_detail' job.pk %}" class="fw-600 text-decoration-none text-dark" style="font-weight:600;">{{ job.title }}</a>
+                <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-type badge-{{ job.job_type }}">{{ job.get_job_type_display }}</span></td>
+          <td>
+            {% if job.is_active %}
+            <span class="badge rounded-pill" style="background:#d1fae5;color:#065f46;font-size:.75rem;">● Active</span>
+            {% else %}
+            <span class="badge rounded-pill" style="background:#f1f5f9;color:#64748b;font-size:.75rem;">● Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'job_applications' job.pk %}" class="d-inline-flex align-items-center gap-1 text-decoration-none fw-600" style="color:#4f46e5;font-weight:600;">
+              <i class="bi bi-people"></i> {{ job.applications.count }}
+            </a>
+          </td>
+          <td><small class="text-muted">{{ job.created_at|date:"M d, Y" }}</small></td>
+          <td class="pe-4">
+            <div class="d-flex gap-2">
+              <a href="{% url 'job_edit' job.pk %}" class="btn btn-outline-primary btn-sm" title="Edit"><i class="bi bi-pencil"></i></a>
+              <a href="{% url 'job_delete' job.pk %}" class="btn btn-outline-danger btn-sm" title="Delete"><i class="bi bi-trash"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% else %}
-<div class="text-center py-5">
-  <i class="bi bi-briefcase display-1 text-muted"></i>
-  <p class="text-muted mt-3">You haven't posted any jobs yet.</p>
-  <a href="{% url 'job_create' %}" class="btn btn-primary">Post Your First Job</a>
+<div class="card">
+  <div class="empty-state">
+    <i class="bi bi-briefcase"></i>
+    <h5 class="mt-3 fw-600">No jobs posted yet</h5>
+    <p class="text-muted">Create your first listing and start receiving applications.</p>
+    <a href="{% url 'job_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Post Your First Job</a>
+  </div>
 </div>
 {% endif %}
 {% endblock %}

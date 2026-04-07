@@ -2,74 +2,103 @@
 {% block title %}{{ action }} Job{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-lg-8">
-    <div class="card shadow-sm border-0">
-      <div class="card-body p-4">
-        <h3 class="mb-4"><i class="bi bi-briefcase"></i> {{ action }} Job Posting</h3>
-        <form method="post">
-          {% csrf_token %}
+  <div class="col-lg-9">
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div class="rounded-3 p-3" style="background:#eef2ff;"><i class="bi bi-briefcase-fill text-primary fs-4" style="color:#4f46e5!important;"></i></div>
+      <div>
+        <h3 class="mb-0 fw-800" style="font-weight:800;">{{ action }} Job Posting</h3>
+        <p class="text-muted small mb-0">Fill in the details below to {{ action|lower }} your listing</p>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Basic Info -->
+      <div class="card mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-700 mb-3 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:.08em;font-weight:700;">📋 Basic Information</h6>
           <div class="row g-3">
             <div class="col-12">
-              <label class="form-label fw-semibold">Job Title *</label>
+              <label class="form-label">Job Title <span class="text-danger">*</span></label>
               {{ form.title }}
-              {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors }}</div>{% endif %}
+              {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors }}</div>{% endif %}
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Company *</label>
+              <label class="form-label">Company <span class="text-danger">*</span></label>
               {{ form.company }}
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Location *</label>
+              <label class="form-label">Location <span class="text-danger">*</span></label>
               {{ form.location }}
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Job Type</label>
+              <label class="form-label">Job Type</label>
               {{ form.job_type }}
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Category</label>
+              <label class="form-label">Category</label>
               {{ form.category }}
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Min Salary</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compensation & Dates -->
+      <div class="card mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-700 mb-3 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:.08em;font-weight:700;">💰 Compensation & Timeline</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Min Salary ($/yr)</label>
               {{ form.salary_min }}
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Max Salary</label>
+            <div class="col-md-4">
+              <label class="form-label">Max Salary ($/yr)</label>
               {{ form.salary_max }}
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Deadline</label>
+            <div class="col-md-4">
+              <label class="form-label">Application Deadline</label>
               {{ form.deadline }}
             </div>
-            <div class="col-md-6 d-flex align-items-end pb-2">
-              <div class="form-check">
+            <div class="col-12">
+              <div class="form-check form-switch">
                 {{ form.is_active }}
-                <label class="form-check-label fw-semibold">Active Listing</label>
+                <label class="form-check-label fw-600" style="font-weight:600;">Active Listing <span class="text-muted fw-400 small" style="font-weight:400;">(uncheck to hide from job seekers)</span></label>
               </div>
             </div>
-            <div class="col-12">
-              <label class="form-label fw-semibold">Job Description *</label>
-              {{ form.description }}
-            </div>
-            <div class="col-12">
-              <label class="form-label fw-semibold">Requirements</label>
-              {{ form.requirements }}
-            </div>
           </div>
-          <div class="mt-4 d-flex gap-2">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> {{ action }} Job</button>
-            <a href="{% url 'my_jobs' %}" class="btn btn-outline-secondary">Cancel</a>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
+
+      <!-- Description -->
+      <div class="card mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-700 mb-3 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:.08em;font-weight:700;">📝 Job Details</h6>
+          <div class="mb-3">
+            <label class="form-label">Job Description <span class="text-danger">*</span></label>
+            {{ form.description }}
+          </div>
+          <div>
+            <label class="form-label">Requirements</label>
+            {{ form.requirements }}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-3 justify-content-end">
+        <a href="{% url 'my_jobs' %}" class="btn btn-outline-secondary px-4" style="border-radius:9px;">Cancel</a>
+        <button type="submit" class="btn btn-primary px-5"><i class="bi bi-check-circle me-2"></i>{{ action }} Job</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
 $('form select, form input[type=text], form input[type=number], form input[type=url], form input[type=date], form textarea').addClass('form-control');
+$('form select').removeClass('form-control').addClass('form-select');
 $('form input[type=checkbox]').addClass('form-check-input');
 </script>
 {% endblock %}

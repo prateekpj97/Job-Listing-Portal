@@ -2,20 +2,39 @@
 {% block title %}Update Status{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="card shadow-sm border-0">
-      <div class="card-body p-4">
-        <h4 class="mb-1">Update Application Status</h4>
-        <p class="text-muted mb-4">{{ application.applicant.username }} → {{ application.job.title }}</p>
+  <div class="col-md-6 col-lg-5">
+    <div class="card">
+      <div class="card-body p-4 p-lg-5">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex rounded-3 p-3 mb-3" style="background:#eef2ff;">
+            <i class="bi bi-arrow-repeat" style="color:#4f46e5;font-size:1.6rem;"></i>
+          </div>
+          <h4 class="fw-800 mb-1" style="font-weight:800;">Update Status</h4>
+          <p class="text-muted small mb-0">Review and update the application status for this candidate</p>
+        </div>
+
+        <!-- Applicant Summary -->
+        <div class="rounded-3 p-3 mb-4" style="background:#f8fafc;border:1.5px solid #e2e8f0;">
+          <div class="d-flex align-items-center gap-3">
+            <div class="company-logo" style="width:40px;height:40px;font-size:.9rem;border-radius:10px;background:#e0e7ff;color:#4f46e5;">
+              {{ application.applicant.username|slice:":1"|upper }}
+            </div>
+            <div>
+              <div class="fw-600 small" style="font-weight:600;">{{ application.applicant.get_full_name|default:application.applicant.username }}</div>
+              <div class="text-muted small">applied for <strong>{{ application.job.title }}</strong></div>
+            </div>
+          </div>
+        </div>
+
         <form method="post">
           {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Status</label>
+          <div class="mb-4">
+            <label class="form-label">Application Status</label>
             {{ form.status }}
           </div>
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <a href="{% url 'job_applications' application.job.pk %}" class="btn btn-outline-secondary">Cancel</a>
+          <div class="d-flex gap-3">
+            <a href="{% url 'job_applications' application.job.pk %}" class="btn btn-outline-secondary flex-fill" style="border-radius:9px;">Cancel</a>
+            <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-check-circle me-2"></i>Save Status</button>
           </div>
         </form>
       </div>

@@ -1,67 +1,118 @@
 {% extends 'base.html' %}
 {% block title %}{{ job.title }}{% endblock %}
 {% block content %}
-<div class="row">
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="{% url 'job_list' %}" class="text-decoration-none">Jobs</a></li>
+    {% if job.category %}<li class="breadcrumb-item text-muted">{{ job.category }}</li>{% endif %}
+    <li class="breadcrumb-item active text-muted">{{ job.title }}</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <!-- Main Content -->
   <div class="col-lg-8">
-    <div class="card shadow-sm border-0 mb-4">
+    <!-- Header Card -->
+    <div class="card mb-4">
       <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-          <div>
-            <h2 class="mb-1">{{ job.title }}</h2>
-            <p class="text-muted mb-0"><i class="bi bi-building"></i> {{ job.company }} &nbsp;<i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="company-logo" style="width:60px;height:60px;font-size:1.4rem;border-radius:14px;">{{ job.company|slice:":1"|upper }}</div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+              <div>
+                <h2 class="fw-800 mb-1" style="font-weight:800;">{{ job.title }}</h2>
+                <p class="text-muted mb-0"><i class="bi bi-building me-1"></i>{{ job.company }}<span class="mx-2">·</span><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</p>
+              </div>
+              <span class="badge-type badge-{{ job.job_type }} fs-6">{{ job.get_job_type_display }}</span>
+            </div>
           </div>
-          <span class="badge bg-primary fs-6">{{ job.get_job_type_display }}</span>
         </div>
-        <hr>
-        <h5>Job Description</h5>
-        <p>{{ job.description|linebreaks }}</p>
+        {% if job.salary_min and job.salary_max %}
+        <div class="mb-3"><span class="salary-chip fs-6"><i class="bi bi-cash"></i> ${{ job.salary_min|floatformat:0 }} – ${{ job.salary_max|floatformat:0 }} / year</span></div>
+        {% endif %}
+        <div class="d-flex gap-2 flex-wrap text-muted small">
+          <span><i class="bi bi-clock me-1"></i>Posted {{ job.created_at|timesince }} ago</span>
+          <span class="mx-1">·</span>
+          <span><i class="bi bi-people me-1"></i>{{ job.applications.count }} applicant{{ job.applications.count|pluralize }}</span>
+          {% if job.deadline %}<span class="mx-1">·</span><span><i class="bi bi-calendar-x me-1"></i>Deadline: {{ job.deadline }}</span>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="card mb-4">
+      <div class="card-body p-4">
+        <h5 class="fw-700 mb-3" style="font-weight:700;"><i class="bi bi-file-text me-2 text-primary"></i>Job Description</h5>
+        <div style="line-height:1.8;color:#374151;">{{ job.description|linebreaks }}</div>
         {% if job.requirements %}
-        <h5>Requirements</h5>
-        <p>{{ job.requirements|linebreaks }}</p>
+        <hr class="my-4">
+        <h5 class="fw-700 mb-3" style="font-weight:700;"><i class="bi bi-check2-square me-2 text-primary"></i>Requirements</h5>
+        <div style="line-height:1.8;color:#374151;">{{ job.requirements|linebreaks }}</div>
         {% endif %}
       </div>
     </div>
   </div>
 
+  <!-- Sidebar -->
   <div class="col-lg-4">
-    <div class="card shadow-sm border-0 mb-3">
-      <div class="card-body">
-        <h5 class="card-title">Job Details</h5>
-        <ul class="list-unstyled">
-          <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <strong>Type:</strong> {{ job.get_job_type_display }}</li>
-          <li class="mb-2"><i class="bi bi-geo-alt text-primary"></i> <strong>Location:</strong> {{ job.location }}</li>
-          {% if job.salary_min and job.salary_max %}
-          <li class="mb-2"><i class="bi bi-cash text-primary"></i> <strong>Salary:</strong> ${{ job.salary_min|floatformat:0 }} – ${{ job.salary_max|floatformat:0 }}</li>
+    <!-- CTA Card -->
+    <div class="card mb-3" style="border:2px solid #eef2ff;">
+      <div class="card-body p-4">
+        {% if user.is_authenticated %}
+          {% if user.role == 'job_seeker' %}
+            {% if user_applied %}
+            <div class="text-center py-2">
+              <div class="mb-2" style="font-size:2.5rem;">✅</div>
+              <h6 class="fw-700">Application Submitted!</h6>
+              <p class="text-muted small mb-0">We've sent your application to {{ job.company }}. Good luck!</p>
+            </div>
+            {% else %}
+            <h6 class="fw-700 mb-1">Ready to apply?</h6>
+            <p class="text-muted small mb-3">Join {{ job.applications.count }} other applicant{{ job.applications.count|pluralize }}</p>
+            <a href="{% url 'apply' job.pk %}" class="btn btn-primary w-100 py-2"><i class="bi bi-send me-2"></i>Apply Now</a>
+            {% endif %}
+          {% elif user == job.posted_by %}
+          <h6 class="fw-700 mb-3">Manage Listing</h6>
+          <div class="d-grid gap-2">
+            <a href="{% url 'job_edit' job.pk %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil me-2"></i>Edit Job</a>
+            <a href="{% url 'job_applications' job.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-people me-2"></i>View Applications ({{ job.applications.count }})</a>
+            <a href="{% url 'job_delete' job.pk %}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-2"></i>Delete Job</a>
+          </div>
           {% endif %}
-          {% if job.category %}
-          <li class="mb-2"><i class="bi bi-tag text-primary"></i> <strong>Category:</strong> {{ job.category }}</li>
-          {% endif %}
-          {% if job.deadline %}
-          <li class="mb-2"><i class="bi bi-calendar text-primary"></i> <strong>Deadline:</strong> {{ job.deadline }}</li>
-          {% endif %}
-          <li class="mb-2"><i class="bi bi-clock text-primary"></i> <strong>Posted:</strong> {{ job.created_at|timesince }} ago</li>
-          <li class="mb-2"><i class="bi bi-people text-primary"></i> <strong>Applicants:</strong> {{ job.applications.count }}</li>
-        </ul>
+        {% else %}
+        <div class="text-center">
+          <div class="mb-2" style="font-size:2rem;">🚀</div>
+          <h6 class="fw-700">Interested in this role?</h6>
+          <p class="text-muted small mb-3">Sign in to apply in seconds</p>
+          <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">Login to Apply</a>
+          <a href="{% url 'register' %}" class="btn btn-outline-primary w-100 btn-sm">Create Account</a>
+        </div>
+        {% endif %}
       </div>
     </div>
 
-    {% if user.is_authenticated %}
-      {% if user.role == 'job_seeker' %}
-        {% if user_applied %}
-        <div class="alert alert-success"><i class="bi bi-check-circle"></i> You have applied for this job.</div>
-        {% else %}
-        <a href="{% url 'apply' job.pk %}" class="btn btn-success w-100 btn-lg"><i class="bi bi-send"></i> Apply Now</a>
+    <!-- Details Card -->
+    <div class="card mb-3">
+      <div class="card-body p-4">
+        <h6 class="fw-700 mb-3" style="font-weight:700;">Job Overview</h6>
+        <div class="detail-stat"><i class="bi bi-briefcase"></i><span><strong>Type:</strong> {{ job.get_job_type_display }}</span></div>
+        <div class="detail-stat"><i class="bi bi-geo-alt"></i><span><strong>Location:</strong> {{ job.location }}</span></div>
+        {% if job.salary_min and job.salary_max %}
+        <div class="detail-stat"><i class="bi bi-cash"></i><span><strong>Salary:</strong> ${{ job.salary_min|floatformat:0 }}–${{ job.salary_max|floatformat:0 }}</span></div>
         {% endif %}
-      {% elif user == job.posted_by %}
-      <a href="{% url 'job_edit' job.pk %}" class="btn btn-warning w-100 mb-2"><i class="bi bi-pencil"></i> Edit Job</a>
-      <a href="{% url 'job_applications' job.pk %}" class="btn btn-info w-100 mb-2"><i class="bi bi-people"></i> View Applications</a>
-      <a href="{% url 'job_delete' job.pk %}" class="btn btn-outline-danger w-100"><i class="bi bi-trash"></i> Delete Job</a>
-      {% endif %}
-    {% else %}
-    <a href="{% url 'login' %}" class="btn btn-primary w-100 btn-lg">Login to Apply</a>
-    {% endif %}
+        {% if job.category %}
+        <div class="detail-stat"><i class="bi bi-tag"></i><span><strong>Category:</strong> {{ job.category }}</span></div>
+        {% endif %}
+        {% if job.deadline %}
+        <div class="detail-stat"><i class="bi bi-calendar-x"></i><span><strong>Deadline:</strong> {{ job.deadline }}</span></div>
+        {% endif %}
+        <div class="detail-stat"><i class="bi bi-clock"></i><span><strong>Posted:</strong> {{ job.created_at|timesince }} ago</span></div>
+      </div>
+    </div>
 
-    <a href="{% url 'job_list' %}" class="btn btn-outline-secondary w-100 mt-2"><i class="bi bi-arrow-left"></i> Back to Jobs</a>
+    <a href="{% url 'job_list' %}" class="btn btn-outline-secondary w-100 btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to Jobs</a>
   </div>
 </div>
 {% endblock %}

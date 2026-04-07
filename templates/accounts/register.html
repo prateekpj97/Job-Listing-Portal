@@ -1,26 +1,55 @@
 {% extends 'base.html' %}
 {% block title %}Register{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-body p-4">
-        <h3 class="card-title mb-4 text-center"><i class="bi bi-person-plus"></i> Create Account</h3>
-        <form method="post">
-          {% csrf_token %}
-          {% for field in form %}
-          <div class="mb-3">
-            <label class="form-label fw-semibold">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}<div class="form-text text-muted">{{ field.help_text }}</div>{% endif %}
-            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+<div class="row g-0 justify-content-center" style="min-height:70vh;align-items:center;">
+  <div class="col-md-10 col-lg-9">
+    <div class="card overflow-hidden" style="border-radius:18px;">
+      <div class="row g-0">
+        <!-- Left panel -->
+        <div class="col-md-4 d-none d-md-flex flex-column justify-content-center p-5 text-white"
+             style="background:linear-gradient(160deg,#10b981 0%,#059669 100%);">
+          <div class="mb-4" style="font-size:3rem;">🚀</div>
+          <h4 class="fw-800 mb-2" style="font-weight:800;">Join JobPortal</h4>
+          <p class="opacity-75 mb-4 small">Create your account and start your journey today — it's completely free.</p>
+          <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-2 opacity-75 small"><i class="bi bi-check-circle-fill"></i> Post or apply for jobs</div>
+            <div class="d-flex align-items-center gap-2 opacity-75 small"><i class="bi bi-check-circle-fill"></i> Real-time notifications</div>
+            <div class="d-flex align-items-center gap-2 opacity-75 small"><i class="bi bi-check-circle-fill"></i> 100% free forever</div>
           </div>
-          {% endfor %}
-          <div class="d-grid"><button type="submit" class="btn btn-success">Create Account</button></div>
-        </form>
-        <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+        <!-- Right form panel -->
+        <div class="col-md-8 p-4 p-md-5">
+          <h4 class="fw-800 mb-1" style="font-weight:800;">Create Account</h4>
+          <p class="text-muted small mb-4">Fill in the details below to get started</p>
+          <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+              {% for field in form %}
+              <div class="col-sm-6">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="form-text small text-muted">{{ field.help_text }}</div>{% endif %}
+                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-success py-2">Create Account <i class="bi bi-arrow-right ms-1"></i></button>
+            </div>
+          </form>
+          <hr class="my-4">
+          <p class="text-center text-muted small mb-0">
+            Already have an account? <a href="{% url 'login' %}" class="fw-600" style="color:#4f46e5;font-weight:600;">Sign in</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+$('form input, form select').addClass('form-control');
+$('form select').removeClass('form-control').addClass('form-select');
+</script>
 {% endblock %}

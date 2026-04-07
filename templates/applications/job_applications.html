@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Applications – {{ job.title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="mb-0">Applications for <em>{{ job.title }}</em></h3>
+    <small class="text-muted">{{ applications|length }} applicant(s)</small>
+  </div>
+  <a href="{% url 'my_jobs' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> My Jobs</a>
+</div>
+{% if applications %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr><th>Applicant</th><th>Email</th><th>Cover Letter</th><th>Resume</th><th>Status</th><th>Applied</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td class="fw-semibold">{{ app.applicant.get_full_name|default:app.applicant.username }}</td>
+        <td>{{ app.applicant.email }}</td>
+        <td><small>{{ app.cover_letter|truncatewords:15 }}</small></td>
+        <td>
+          {% if app.resume %}
+          <a href="{{ app.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-pdf"></i></a>
+          {% else %}<span class="text-muted">—</span>{% endif %}
+        </td>
+        <td>
+          {% if app.status == 'accepted' %}<span class="badge bg-success">{{ app.get_status_display }}</span>
+          {% elif app.status == 'rejected' %}<span class="badge bg-danger">{{ app.get_status_display }}</span>
+          {% elif app.status == 'reviewed' %}<span class="badge bg-warning text-dark">{{ app.get_status_display }}</span>
+          {% else %}<span class="badge bg-secondary">{{ app.get_status_display }}</span>{% endif %}
+        </td>
+        <td><small class="text-muted">{{ app.applied_at|date:"M d, Y" }}</small></td>
+        <td><a href="{% url 'update_status' app.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Update</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-people display-1 text-muted"></i>
+  <p class="text-muted mt-3">No applications yet for this job.</p>
+</div>
+{% endif %}
+{% endblock %}

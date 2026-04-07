@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}{{ job.title }}{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h2 class="mb-1">{{ job.title }}</h2>
+            <p class="text-muted mb-0"><i class="bi bi-building"></i> {{ job.company }} &nbsp;<i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+          </div>
+          <span class="badge bg-primary fs-6">{{ job.get_job_type_display }}</span>
+        </div>
+        <hr>
+        <h5>Job Description</h5>
+        <p>{{ job.description|linebreaks }}</p>
+        {% if job.requirements %}
+        <h5>Requirements</h5>
+        <p>{{ job.requirements|linebreaks }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Job Details</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <strong>Type:</strong> {{ job.get_job_type_display }}</li>
+          <li class="mb-2"><i class="bi bi-geo-alt text-primary"></i> <strong>Location:</strong> {{ job.location }}</li>
+          {% if job.salary_min and job.salary_max %}
+          <li class="mb-2"><i class="bi bi-cash text-primary"></i> <strong>Salary:</strong> ${{ job.salary_min|floatformat:0 }} – ${{ job.salary_max|floatformat:0 }}</li>
+          {% endif %}
+          {% if job.category %}
+          <li class="mb-2"><i class="bi bi-tag text-primary"></i> <strong>Category:</strong> {{ job.category }}</li>
+          {% endif %}
+          {% if job.deadline %}
+          <li class="mb-2"><i class="bi bi-calendar text-primary"></i> <strong>Deadline:</strong> {{ job.deadline }}</li>
+          {% endif %}
+          <li class="mb-2"><i class="bi bi-clock text-primary"></i> <strong>Posted:</strong> {{ job.created_at|timesince }} ago</li>
+          <li class="mb-2"><i class="bi bi-people text-primary"></i> <strong>Applicants:</strong> {{ job.applications.count }}</li>
+        </ul>
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+      {% if user.role == 'job_seeker' %}
+        {% if user_applied %}
+        <div class="alert alert-success"><i class="bi bi-check-circle"></i> You have applied for this job.</div>
+        {% else %}
+        <a href="{% url 'apply' job.pk %}" class="btn btn-success w-100 btn-lg"><i class="bi bi-send"></i> Apply Now</a>
+        {% endif %}
+      {% elif user == job.posted_by %}
+      <a href="{% url 'job_edit' job.pk %}" class="btn btn-warning w-100 mb-2"><i class="bi bi-pencil"></i> Edit Job</a>
+      <a href="{% url 'job_applications' job.pk %}" class="btn btn-info w-100 mb-2"><i class="bi bi-people"></i> View Applications</a>
+      <a href="{% url 'job_delete' job.pk %}" class="btn btn-outline-danger w-100"><i class="bi bi-trash"></i> Delete Job</a>
+      {% endif %}
+    {% else %}
+    <a href="{% url 'login' %}" class="btn btn-primary w-100 btn-lg">Login to Apply</a>
+    {% endif %}
+
+    <a href="{% url 'job_list' %}" class="btn btn-outline-secondary w-100 mt-2"><i class="bi bi-arrow-left"></i> Back to Jobs</a>
+  </div>
+</div>
+{% endblock %}

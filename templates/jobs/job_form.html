@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Job{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h3 class="mb-4"><i class="bi bi-briefcase"></i> {{ action }} Job Posting</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">Job Title *</label>
+              {{ form.title }}
+              {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Company *</label>
+              {{ form.company }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Location *</label>
+              {{ form.location }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Job Type</label>
+              {{ form.job_type }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Category</label>
+              {{ form.category }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Min Salary</label>
+              {{ form.salary_min }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Max Salary</label>
+              {{ form.salary_max }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Deadline</label>
+              {{ form.deadline }}
+            </div>
+            <div class="col-md-6 d-flex align-items-end pb-2">
+              <div class="form-check">
+                {{ form.is_active }}
+                <label class="form-check-label fw-semibold">Active Listing</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Job Description *</label>
+              {{ form.description }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Requirements</label>
+              {{ form.requirements }}
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> {{ action }} Job</button>
+            <a href="{% url 'my_jobs' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+$('form select, form input[type=text], form input[type=number], form input[type=url], form input[type=date], form textarea').addClass('form-control');
+$('form input[type=checkbox]').addClass('form-check-input');
+</script>
+{% endblock %}

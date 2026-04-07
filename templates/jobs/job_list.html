@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Browse Jobs{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <!-- Filter Sidebar -->
+  <div class="col-lg-3">
+    <div class="card shadow-sm sticky-top" style="top:80px">
+      <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi bi-funnel"></i> Filter Jobs</h5>
+        <form method="get" id="filterForm">
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Search</label>
+            {{ filter.form.title }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Location</label>
+            {{ filter.form.location }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Job Type</label>
+            {{ filter.form.job_type }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Category</label>
+            {{ filter.form.category }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Min Salary</label>
+            {{ filter.form.salary_min }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Max Salary</label>
+            {{ filter.form.salary_max }}
+          </div>
+          <div class="d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+            <a href="{% url 'job_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Listings -->
+  <div class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">{{ filter.qs|length }} Jobs Found</h4>
+      {% if user.is_authenticated and user.role == 'employer' %}
+      <a href="{% url 'job_create' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Post a Job</a>
+      {% endif %}
+    </div>
+    {% for job in filter.qs %}
+    <div class="card job-card mb-3 shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h5 class="card-title mb-1"><a href="{% url 'job_detail' job.pk %}" class="text-decoration-none text-dark">{{ job.title }}</a></h5>
+            <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.company }} &nbsp;<i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-primary badge-job-type">{{ job.get_job_type_display }}</span>
+            {% if job.category %}<span class="badge bg-secondary badge-job-type">{{ job.category }}</span>{% endif %}
+          </div>
+        </div>
+        <p class="card-text text-muted small mt-2">{{ job.description|truncatewords:30 }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted">
+            {% if job.salary_min and job.salary_max %}
+            <i class="bi bi-currency-dollar"></i> {{ job.salary_min|floatformat:0 }} – {{ job.salary_max|floatformat:0 }}
+            {% endif %}
+            &nbsp;<i class="bi bi-clock"></i> {{ job.created_at|timesince }} ago
+          </small>
+          <a href="{% url 'job_detail' job.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5">
+      <i class="bi bi-search display-1 text-muted"></i>
+      <p class="text-muted mt-3">No jobs found. Try adjusting your filters.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+$('.card-body select, .card-body input[type=text], .card-body input[type=number]').addClass('form-control form-control-sm');
+</script>
+{% endblock %}
